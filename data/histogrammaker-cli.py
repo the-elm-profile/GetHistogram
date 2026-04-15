@@ -200,7 +200,7 @@ def get_histogram_config(df):
             if new_bins is None: return None
             config['bins'] = new_bins
         elif choice == '6':
-            if ask_yes_no('Toggle log scale on Y axis? [y/n]: '):
+            if ask_yes_no('Change log scale on Y axis? [y/n]: '):
                 config['logscale'] = not config['logscale']
                 print(f"Log scale: {config['logscale']}")
         elif  choice == '7':      
