@@ -52,6 +52,7 @@ with st.sidebar:
         xlabel_size = st.slider('X-label Font Size', 8, 24, 12)
         ylabel = st.text_input('Y-label', 'Frequency')
         ylabel_size = st.slider('Y-label font Size', 8, 24, 12)
+        density = st.checkbox('Normalize Density', False, help='Show propablity density insted of counts')
         logscale = st.checkbox('Log Scale (Y axis)', False)
 
     with st.sidebar.expander('Apperance', expanded=True):
@@ -73,7 +74,6 @@ with st.sidebar:
             else:
                 bins = 'sturges'
                 st.caption(f'Auto Bins: Sturges rule')
-            density = st.checkbox('Normalize Density', False, help='Show propablity density insted of counts')
             st.caption(f"{len(df[column].dropna())} data points → {bins} bins")
         
 
