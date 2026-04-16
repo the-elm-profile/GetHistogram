@@ -43,22 +43,40 @@ with st.sidebar:
     missing = df[column].isna().sum()
     if missing > 0:
         st.warning(f'{missing} missing values ignored.')
+
     st.header("Configure")
-    title = st.text_input('Title', 'Histogram')
-    title_size = st.slider('Title Font Size', 8, 32, 20)
-    xlabel = st.text_input('X-label', 'Value')
-    xlabel_size = st.slider('X-label Font Size', 8, 24, 12)
-    ylabel = st.text_input('Y-label', 'Frequency')
-    ylabel_size = st.slider('Y-label font Size', 8, 24, 12)
-    bins = st.slider('Bins', 1, 50, 10)
-    density = st.checkbox('Normalize Density', False)
-    bin_mode = st.selectbox('Bin Mode', ['Fixed', 'Auto Sqrt', 'Auto Sturges'])
-    color = st.color_picker('Bar Color', '#4682B4')
-    edgecolor = st.color_picker('Edge Color', '#000000')
-    alpha = st.slider('Transparency', 0.1, 1.00, 0.85)
-    logscale = st.checkbox('Log Scale (Y axis)', False)
-    show_grid = st.checkbox('Show Grid', True)
-    
+    with st.sidebar.expander('Title, X and Y axis', expanded=True):
+        title = st.text_input('Title', 'Histogram')
+        title_size = st.slider('Title Font Size', 8, 32, 20)
+        xlabel = st.text_input('X-label', 'Value')
+        xlabel_size = st.slider('X-label Font Size', 8, 24, 12)
+        ylabel = st.text_input('Y-label', 'Frequency')
+        ylabel_size = st.slider('Y-label font Size', 8, 24, 12)
+        logscale = st.checkbox('Log Scale (Y axis)', False)
+
+    with st.sidebar.expander('Apperance', expanded=True):
+        col1, col2 = st.columns(2)
+        with col1:
+            color = st.color_picker('Bar Color', '#4682B4')
+        with col2:
+            edgecolor = st.color_picker('Edge Color', '#000000')
+        alpha = st.slider('Transparency', 0.1, 1.00, 0.85)
+        show_grid = st.checkbox('Show Grid', True)
+
+    with st.sidebar.expander('Binnig'):
+            bin_mode = st.selectbox('Bin Mode', ['Fixed', 'Auto Sqrt', 'Auto Sturges'])
+            if bin_mode == 'Fixed':
+                bins = st.slider('Bins', 1, 50, 10)
+            elif bin_mode == 'Auto Sqrt':
+                bins = int(len(df[column].dropna()) ** 0.5)
+                st.caption(f"Auto Bins Sqrt: **{bins}**")
+            else:
+                bins = 'sturges'
+                st.caption(f'Auto Bins: Sturges rule')
+            density = st.checkbox('Normalize Density', False, help='Show propablity density insted of counts')
+            st.caption(f"{len(df[column].dropna())} data points → {bins} bins")
+        
+
 def histogram():
     st.subheader('Histogram')
     fig, ax = plt.subplots()
@@ -88,24 +106,21 @@ def statistics(fig):
     min_val = data.min()
     max_val = data.max()
 
-    if bin_mode == 'Auto (sqrt)':
-        bins = int(len(data) ** 0.5)
-    elif bin_mode == 'Auto (sturges)':
-        bins = 'sturges'
-
     st.subheader('Summary Statistics')
     col1, col2 = st.columns(2)
     col1.metric('Count', f'{count}')
-    col1.metric('Mean', f'{mean:.0f}')
+    col1.metric('Mean', f'{mean:.2f}')
     col1.metric('Median', f'{median:.2f}')
     col2.metric('Std. Dev', f'{std:.3f}')
-    col2.metric('Min. Value', f'{min_val:.0f}')
-    col2.metric('Max. Value', f'{max_val:.0f}')
+    col2.metric('Min. Value', f'{min_val:.2f}')
+    col2.metric('Max. Value', f'{max_val:.2f}')
+
     buf = io.BytesIO()
-    fig.savefig(buf, format='png')
+    fig.savefig(buf, format='png', bbox_inches='tight')
+    buf.seek(0)
     st.download_button(
         'Download histogram',
-        data=buf.getvalue(),
+        data=buf,
         file_name=f'{title}.png',
         mime='image/png'
     )
@@ -113,7 +128,7 @@ def statistics(fig):
 left, right = st.columns([2, 1])
 with left:
     fig = histogram()
-
+    
 with right:
     statistics(fig)
     
