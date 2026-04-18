@@ -7,8 +7,8 @@ import matplotlib.pyplot as plt
 def load_csv(file):
     return pd.read_csv(file)
 
-st.set_page_config(page_title='Histogram Maker', layout='wide')  
-st.title('Histogram Maker')
+st.set_page_config(page_title='Get Histogram', layout='wide')  
+st.title('Get Histogram')
 
 with st.sidebar:
     st.header('Load .csv')
@@ -25,6 +25,7 @@ with st.sidebar:
             st.error(f'Error: {e}')
 
 if 'df' not in st.session_state or st.session_state['df'] is None:
+    st.info('This program makes histogram accourding to the data in a your .csv file, much used in data-science to visualize better the data and make inferences with it.')
     st.info('Upload a .csv file from the side bar to begin.')
     st.stop()
 
