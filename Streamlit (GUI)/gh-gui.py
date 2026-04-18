@@ -25,7 +25,7 @@ with st.sidebar:
             st.error(f'Error: {e}')
 
 if 'df' not in st.session_state or st.session_state['df'] is None:
-    st.info('This program makes histogram accourding to the data in a your .csv file, much used in data-science to visualize better the data and make inferences with it.')
+    st.info('This application creates histograms from CSV datasets, allowing you to explore data distributions and uncover patterns.')
     st.info('Upload a .csv file from the side bar to begin.')
     st.stop()
 
