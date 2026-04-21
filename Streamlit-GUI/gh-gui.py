@@ -112,12 +112,12 @@ def histogram():
     if logscale is True:
         ax.set_yscale('log')
     if median_line:
-        ax.axvline(median, color=median_color, linestyle='dashed', linewidth=2, label=f'Median: {median:.2f}')
+        ax.axvline(median, color=median_color, linestyle='dashed', linewidth=2, label=f'Median: {median:.4f}')
     if mean_line:
-        ax.axvline(mean, color=mean_color, linestyle='dashed', linewidth=2, label=f'Mean: {mean:.2f}')
+        ax.axvline(mean, color=mean_color, linestyle='dashed', linewidth=2, label=f'Mean: {mean:.4f}')
     if std_line:
-        ax.axvline(mean + std, color=std_color, linestyle='dotted', linewidth=2, label=f'Mean + Std Dev: {mean + std:.2f}')
-        ax.axvline(mean - std, color=std_color, linestyle='dotted', linewidth=2, label=f'Mean - Std Dev: {mean - std:.2f}')
+        ax.axvline(mean + std, color=std_color, linestyle='dotted', linewidth=2, label=f'Mean + Std Dev: {mean + std:.4f}')
+        ax.axvline(mean - std, color=std_color, linestyle='dotted', linewidth=2, label=f'Mean - Std Dev: {mean - std:.4f}')
     if median_line or mean_line or std_line:
         ax.legend()
     st.pyplot(fig)
@@ -135,11 +135,11 @@ def statistics(fig):
 
     col1, col2 = st.columns(2)
     col1.metric('Count', f'{len(data)}')
-    col1.metric('Mean', f'{mean:.2f}')
-    col1.metric('Median', f'{median:.2f}')
-    col2.metric('Std. Dev', f'{std:.3f}')
-    col2.metric('Min. Value', f'{min_val:.2f}')
-    col2.metric('Max. Value', f'{max_val:.2f}')
+    col1.metric('Mean', f'{mean:.4f}')
+    col1.metric('Median', f'{median:.4f}')
+    col2.metric('Std. Dev', f'{std:.4f}')
+    col2.metric('Min. Value', f'{min_val:.4f}')
+    col2.metric('Max. Value', f'{max_val:.4f}')
 
     buf = io.BytesIO()
     fig.savefig(buf, format='png', bbox_inches='tight')
