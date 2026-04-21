@@ -3,12 +3,15 @@ import pandas as pd
 import streamlit as st  
 import matplotlib.pyplot as plt
 
-@st.cache_data
+@st.cache_resource
 def load_csv(file):
     return pd.read_csv(file)
-
+        
 st.set_page_config(page_title='Get Histogram', layout='wide')  
 st.title('Get Histogram')
+
+with st.expander("Project info"):
+    st.markdown("Made for study proposes only. | GitHub: https://github.com/the-elm-profile/GetHistogram | Under The Gnu General Public License v3.0.")
 
 with st.sidebar:
     st.header('Load .csv')
@@ -16,7 +19,7 @@ with st.sidebar:
     if uploaded is not None:
         try:
             df = load_csv(uploaded)
-            st.session_state['df'] = df
+            st.session_state['df']= df
             st.session_state['filename'] = uploaded.name
             st.success(f"Loaded {len(df)} rows from '{uploaded.name}'")
         except pd.errors.EmptyDataError:
@@ -28,10 +31,6 @@ if 'df' not in st.session_state or st.session_state['df'] is None:
     st.info('This application creates histograms from CSV datasets, allowing you to explore data distributions and uncover patterns.')
     st.info('Upload a .csv file from the side bar to begin.')
     st.stop()
-
-st.subheader('Preview')
-df = st.session_state['df']
-st.dataframe(df.head())
 
 with st.sidebar:
     st.header('Data')
@@ -45,18 +44,18 @@ with st.sidebar:
     if missing > 0:
         st.warning(f'{missing} missing values ignored.')
 
-    st.header("Configure")
-    with st.sidebar.expander('Title, X and Y axis', expanded=True):
+    st.header('Configure')
+    with st.sidebar.expander('Title, X and Y axis'):
         title = st.text_input('Title', 'Histogram')
         title_size = st.slider('Title Font Size', 8, 32, 20)
         xlabel = st.text_input('X-label', 'Value')
         xlabel_size = st.slider('X-label Font Size', 8, 24, 12)
         ylabel = st.text_input('Y-label', 'Frequency')
         ylabel_size = st.slider('Y-label font Size', 8, 24, 12)
-        density = st.checkbox('Normalize Density', False, help='Show propablity density insted of counts')
+        density = st.checkbox('Normalize Density', False, help='Show propability density insted of counts')
         logscale = st.checkbox('Log Scale (Y axis)', False)
 
-    with st.sidebar.expander('Apperance', expanded=True):
+    with st.sidebar.expander('Appearance'):
         col1, col2 = st.columns(2)
         with col1:
             color = st.color_picker('Bar Color', '#4682B4')
@@ -76,40 +75,69 @@ with st.sidebar:
                 bins = 'sturges'
                 st.caption(f'Auto Bins: Sturges rule')
             st.caption(f"{len(df[column].dropna())} data points → {bins} bins")
-        
 
+    with st.sidebar.expander('Statistics in Histogram'):
+        con1 = st.container(border=True)
+        con2 = st.container(border=True)
+        con3 = st.container(border=True)
+        with con1:
+            median_line = st.checkbox('Include the median in the histogram')
+            median_color = st.color_picker('Median-line color', '#FF0000')
+        with con2:    
+            mean_line = st.checkbox('Include the mean in the histogram')
+            mean_color = st.color_picker('Mean-line color', '#FFFF00')
+        with con3:    
+            std_line = st.checkbox('Include the standard deviation in the histogram')
+            std_color = st.color_picker('Std-line color', '#008000')
+        
 def histogram():
     st.subheader('Histogram')
-    fig, ax = plt.subplots()
+    fig,ax = plt.subplots()
+    data = df[column].dropna()
+    
     ax.set_title(title, fontsize=title_size)
     ax.set_xlabel(xlabel, fontsize=xlabel_size)
+    if density: 
+        ylabel='Density'
+    else: ylabel='Frequency'
     ax.set_ylabel(ylabel, fontsize=ylabel_size)
     ax.hist(df[column].dropna(), 
             bins=bins, 
             color=color, 
             edgecolor=edgecolor, 
             alpha=alpha,
-            density=density,)
-    if show_grid is True:
+            density=density,) 
+    median = data.median()
+    mean = data.mean()
+    std = data.std()
+    if show_grid:
         ax.grid(True, axis='y', alpha=alpha)
     if logscale is True:
         ax.set_yscale('log')
+    if median_line:
+        ax.axvline(median, color=median_color, linestyle='dashed', linewidth=2, label=f'Median: {median:.2f}')
+    if mean_line:
+        ax.axvline(mean, color=mean_color, linestyle='dashed', linewidth=2, label=f'Mean: {mean:.2f}')
+    if std_line:
+        ax.axvline(mean + std, color=std_color, linestyle='dotted', linewidth=2, label=f'Mean + Std Dev: {mean + std:.2f}')
+        ax.axvline(mean - std, color=std_color, linestyle='dotted', linewidth=2, label=f'Mean - Std Dev: {mean - std:.2f}')
+    if median_line or mean_line or std_line:
+        ax.legend()
     st.pyplot(fig)
     plt.close(fig)
     return fig
 
 def statistics(fig):
+    st.subheader('Summary Statistics')
     data = df[column].dropna()
-    count = data.count()
-    mean = data.mean()
     median = data.median()
+    mean = data.mean()
     std = data.std()
     min_val = data.min()
     max_val = data.max()
 
-    st.subheader('Summary Statistics')
     col1, col2 = st.columns(2)
-    col1.metric('Count', f'{count}')
+    col1.metric('Count', f'{len(data)}')
     col1.metric('Mean', f'{mean:.2f}')
     col1.metric('Median', f'{median:.2f}')
     col2.metric('Std. Dev', f'{std:.3f}')
@@ -123,13 +151,16 @@ def statistics(fig):
         'Download histogram',
         data=buf,
         file_name=f'{title}.png',
-        mime='image/png'
-    )
+        mime='image/png',
+)
 
 left, right = st.columns([2, 1])
 with left:
     fig = histogram()
-    
+
 with right:
     statistics(fig)
-    
+
+st.subheader('Data view')
+df = st.session_state['df']
+st.dataframe(df, height=250) 
