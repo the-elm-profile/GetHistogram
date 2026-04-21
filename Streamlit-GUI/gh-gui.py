@@ -97,9 +97,6 @@ def histogram():
     
     ax.set_title(title, fontsize=title_size)
     ax.set_xlabel(xlabel, fontsize=xlabel_size)
-    if density: 
-        ylabel='Density'
-    else: ylabel='Frequency'
     ax.set_ylabel(ylabel, fontsize=ylabel_size)
     ax.hist(df[column].dropna(), 
             bins=bins, 
