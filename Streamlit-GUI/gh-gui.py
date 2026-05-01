@@ -1,5 +1,5 @@
 import io
-import math
+import numpy as np
 import pandas as pd
 import streamlit as st  
 import matplotlib.pyplot as plt
@@ -131,7 +131,7 @@ def statistics(fig):
     median = data.median()
     mean = data.mean()
     std = data.std()
-    uncert = std/math.sqrt(data)
+    uncert = std/np.sqrt(data)
     min_val = data.min()
     max_val = data.max()
 
