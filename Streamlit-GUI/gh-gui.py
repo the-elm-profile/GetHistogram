@@ -131,7 +131,8 @@ def statistics(fig):
     median = data.median()
     mean = data.mean()
     std = data.std()
-    uncert = std/np.sqrt(data)
+    sqrtdata = np.sqrt(data)
+    uncert = std/sqrtdata
     min_val = data.min()
     max_val = data.max()
 
