@@ -1,4 +1,5 @@
 import io
+import math
 import pandas as pd
 import streamlit as st  
 import matplotlib.pyplot as plt
@@ -140,6 +141,7 @@ def statistics(fig):
     col1.metric('Mean', f'{mean:.4f}')
     col1.metric('Median', f'{median:.4f}')
     col2.metric('Std. Dev', f'{std:.4f}')
+    col2.metric('Uncertanty', f'{uncert:.4f}')
     col2.metric('Min. Value', f'{min_val:.4f}')
     col2.metric('Max. Value', f'{max_val:.4f}')
 
